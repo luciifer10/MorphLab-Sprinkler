@@ -1,0 +1,900 @@
+<UserControl x:Class="MorphLab.Sprinkler.UI.SprinklerPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             FontFamily="Segoe UI" FontSize="12" Foreground="#0F172A"
+             Background="#F4F7FB" MinWidth="340">
+
+    <UserControl.Resources>
+        <!-- ===================== palette ===================== -->
+        <SolidColorBrush x:Key="Ink" Color="#0F172A"/>
+        <SolidColorBrush x:Key="Slate" Color="#475569"/>
+        <SolidColorBrush x:Key="Muted" Color="#8A97AB"/>
+        <SolidColorBrush x:Key="Line" Color="#DDE5EF"/>
+        <SolidColorBrush x:Key="Card" Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="Blue" Color="#1C6EB5"/>
+        <SolidColorBrush x:Key="BlueDeep" Color="#134E86"/>
+        <SolidColorBrush x:Key="BlueTint" Color="#E8F1FA"/>
+        <SolidColorBrush x:Key="Red" Color="#D62828"/>
+        <SolidColorBrush x:Key="RedTint" Color="#FDECEC"/>
+        <SolidColorBrush x:Key="Green" Color="#15803D"/>
+        <SolidColorBrush x:Key="GreenTint" Color="#E7F6EC"/>
+        <SolidColorBrush x:Key="Amber" Color="#A15C07"/>
+        <SolidColorBrush x:Key="AmberTint" Color="#FEF4E2"/>
+        <FontFamily x:Key="NumFont">Bahnschrift, Segoe UI</FontFamily>
+
+        <!-- blueprint grid used in the header and the preview -->
+        <DrawingBrush x:Key="Blueprint" TileMode="Tile" Viewport="0,0,16,16" ViewportUnits="Absolute">
+            <DrawingBrush.Drawing>
+                <GeometryDrawing>
+                    <GeometryDrawing.Pen><Pen Brush="#22FFFFFF" Thickness="0.6"/></GeometryDrawing.Pen>
+                    <GeometryDrawing.Geometry><GeometryGroup>
+                        <LineGeometry StartPoint="0,0" EndPoint="16,0"/>
+                        <LineGeometry StartPoint="0,0" EndPoint="0,16"/>
+                    </GeometryGroup></GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingBrush.Drawing>
+        </DrawingBrush>
+        <DrawingBrush x:Key="PaperGrid" TileMode="Tile" Viewport="0,0,20,20" ViewportUnits="Absolute">
+            <DrawingBrush.Drawing>
+                <GeometryDrawing>
+                    <GeometryDrawing.Pen><Pen Brush="#E6EDF5" Thickness="0.7"/></GeometryDrawing.Pen>
+                    <GeometryDrawing.Geometry><GeometryGroup>
+                        <LineGeometry StartPoint="0,0" EndPoint="20,0"/>
+                        <LineGeometry StartPoint="0,0" EndPoint="0,20"/>
+                    </GeometryGroup></GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingBrush.Drawing>
+        </DrawingBrush>
+
+        <!-- ===================== cards & text ===================== -->
+        <Style x:Key="CardBox" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource Card}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource Line}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Padding" Value="12"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+        </Style>
+        <Style x:Key="H" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="13.5"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{StaticResource Ink}"/>
+            <Setter Property="Margin" Value="0,0,0,2"/>
+        </Style>
+        <Style x:Key="Sub" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="11.5"/>
+            <Setter Property="Foreground" Value="{StaticResource Slate}"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="Margin" Value="0,0,0,8"/>
+        </Style>
+        <Style x:Key="FieldLabel" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Foreground" Value="{StaticResource Slate}"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,0,8,0"/>
+        </Style>
+
+        <!-- ===================== buttons ===================== -->
+        <Style x:Key="Btn" TargetType="Button">
+            <Setter Property="Foreground" Value="{StaticResource Ink}"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="{StaticResource Line}"/>
+            <Setter Property="Padding" Value="12,7"/>
+            <Setter Property="Margin" Value="0,0,6,6"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="B" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="1" CornerRadius="7" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="B" Property="BorderBrush" Value="{StaticResource Blue}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="B" Property="Opacity" Value="0.85"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="B" Property="Opacity" Value="0.45"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="Primary" TargetType="Button" BasedOn="{StaticResource Btn}">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="{StaticResource Blue}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BlueDeep}"/>
+        </Style>
+        <Style x:Key="Fire" TargetType="Button" BasedOn="{StaticResource Btn}">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="{StaticResource Red}"/>
+            <Setter Property="BorderBrush" Value="#A61E1E"/>
+            <Setter Property="Padding" Value="14,11"/>
+            <Setter Property="FontSize" Value="13"/>
+        </Style>
+
+        <Style TargetType="TextBox">
+            <Setter Property="Padding" Value="6,4"/>
+            <Setter Property="BorderBrush" Value="{StaticResource Line}"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style TargetType="ComboBox">
+            <Setter Property="Padding" Value="6,4"/>
+            <Setter Property="MinHeight" Value="26"/>
+        </Style>
+        <Style TargetType="CheckBox">
+            <Setter Property="Margin" Value="0,3,0,3"/>
+            <Setter Property="Foreground" Value="{StaticResource Ink}"/>
+        </Style>
+
+        <!-- stat chip -->
+        <Style x:Key="Chip" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource BlueTint}"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="9,6"/>
+            <Setter Property="Margin" Value="0,0,6,6"/>
+        </Style>
+        <Style x:Key="ChipNum" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="{StaticResource NumFont}"/>
+            <Setter Property="FontSize" Value="17"/>
+            <Setter Property="Foreground" Value="{StaticResource BlueDeep}"/>
+        </Style>
+        <Style x:Key="ChipLbl" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="10.5"/>
+            <Setter Property="Foreground" Value="{StaticResource Slate}"/>
+        </Style>
+
+        <!-- ===================== stepper tabs ===================== -->
+        <Style x:Key="StepTabs" TargetType="TabControl">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabControl">
+                        <DockPanel>
+                            <Border DockPanel.Dock="Top" Background="White" BorderBrush="{StaticResource Line}" BorderThickness="0,0,0,1">
+                                <UniformGrid Rows="1" IsItemsHost="True"/>
+                            </Border>
+                            <ContentPresenter ContentSource="SelectedContent"/>
+                        </DockPanel>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="TabItem">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Grid Background="Transparent">
+                            <StackPanel HorizontalAlignment="Center" Margin="0,8,0,7">
+                                <Border x:Name="Dot" Width="24" Height="24" CornerRadius="12" Background="#EEF2F7" HorizontalAlignment="Center">
+                                    <TextBlock x:Name="Num" Text="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}"
+                                               FontFamily="{StaticResource NumFont}" FontSize="12" Foreground="{StaticResource Slate}"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <ContentPresenter x:Name="Lbl" ContentSource="Header" HorizontalAlignment="Center" Margin="0,4,0,0"
+                                                  TextElement.FontSize="10.5" TextElement.Foreground="{StaticResource Slate}"/>
+                            </StackPanel>
+                            <Border x:Name="Bar" Height="3" VerticalAlignment="Bottom" CornerRadius="2,2,0,0" Margin="10,0" Background="Transparent"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Dot" Property="Background" Value="{StaticResource Blue}"/>
+                                <Setter TargetName="Num" Property="Foreground" Value="White"/>
+                                <Setter TargetName="Lbl" Property="TextElement.Foreground" Value="{StaticResource Ink}"/>
+                                <Setter TargetName="Bar" Property="Background" Value="{StaticResource Blue}"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Dot" Property="BorderBrush" Value="{StaticResource Blue}"/>
+                                <Setter TargetName="Dot" Property="BorderThickness" Value="1"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- K-factor badge: colour per K so the library reads at a glance -->
+        <Style x:Key="KBadge" TargetType="Border">
+            <Setter Property="Width" Value="48"/>
+            <Setter Property="Height" Value="48"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Background" Value="#475569"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding KType}" Value="K80"><Setter Property="Background" Value="#1C6EB5"/></DataTrigger>
+                <DataTrigger Binding="{Binding KType}" Value="K115"><Setter Property="Background" Value="#0E7490"/></DataTrigger>
+                <DataTrigger Binding="{Binding KType}" Value="K160"><Setter Property="Background" Value="#D97706"/></DataTrigger>
+                <DataTrigger Binding="{Binding KType}" Value="K200"><Setter Property="Background" Value="#B45309"/></DataTrigger>
+                <DataTrigger Binding="{Binding KType}" Value="K240"><Setter Property="Background" Value="#D62828"/></DataTrigger>
+                <DataTrigger Binding="{Binding KType}" Value="K320"><Setter Property="Background" Value="#7C3AED"/></DataTrigger>
+                <DataTrigger Binding="{Binding KType}" Value="K360"><Setter Property="Background" Value="#6D28D9"/></DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="DataGrid">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="{StaticResource Line}"/>
+            <Setter Property="GridLinesVisibility" Value="Horizontal"/>
+            <Setter Property="HorizontalGridLinesBrush" Value="#EEF2F7"/>
+            <Setter Property="HeadersVisibility" Value="Column"/>
+            <Setter Property="RowHeight" Value="26"/>
+            <Setter Property="AutoGenerateColumns" Value="False"/>
+            <Setter Property="CanUserAddRows" Value="False"/>
+            <Setter Property="CanUserDeleteRows" Value="False"/>
+            <Setter Property="SelectionMode" Value="Single"/>
+        </Style>
+        <Style TargetType="DataGridColumnHeader">
+            <Setter Property="Background" Value="#F1F5FA"/>
+            <Setter Property="Foreground" Value="{StaticResource Slate}"/>
+            <Setter Property="FontSize" Value="10.5"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="6,5"/>
+            <Setter Property="BorderBrush" Value="{StaticResource Line}"/>
+            <Setter Property="BorderThickness" Value="0,0,0,1"/>
+        </Style>
+    </UserControl.Resources>
+
+    <DockPanel>
+        <!-- ============================== HEADER ============================== -->
+        <Border DockPanel.Dock="Top" Height="96">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="#0B2545" Offset="0"/>
+                    <GradientStop Color="#134E86" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.Background>
+            <Grid>
+                <Rectangle Fill="{StaticResource Blueprint}"/>
+                <!-- spray motif: a sprinkler head with its discharge pattern -->
+                <Canvas HorizontalAlignment="Right" Width="120" Height="96" Opacity="0.9">
+                    <Path Stroke="#5AA9E6" StrokeThickness="1" Opacity="0.55" StrokeDashArray="2 3"
+                          Data="M 70,30 C 40,50 30,75 26,96 M 70,30 C 60,55 58,80 58,96 M 70,30 C 80,55 82,80 82,96 M 70,30 C 100,50 110,75 114,96"/>
+                    <Rectangle Canvas.Left="66" Canvas.Top="8" Width="8" Height="12" Fill="#9FB3C8"/>
+                    <Path Fill="#5AA9E6" Data="M 60,20 L 80,20 L 75,28 L 65,28 Z"/>
+                    <Ellipse Canvas.Left="58" Canvas.Top="27" Width="24" Height="6" Fill="#F25C54"/>
+                </Canvas>
+                <StackPanel Margin="16,14,0,0" VerticalAlignment="Top">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="morph" FontSize="22" FontWeight="Bold" Foreground="#5AA9E6"/>
+                        <TextBlock Text="LAB" FontSize="22" FontWeight="Light" Foreground="#C8D3E0" Margin="1,0,0,0"/>
+                    </StackPanel>
+                    <TextBlock Text="Sprinkler Designer" FontSize="13" Foreground="White" Margin="1,0,0,0"/>
+                    <TextBlock x:Name="TxtHeaderInfo" Text="Fire protection layout · K80 / K160 / K320" FontSize="10.5"
+                               Foreground="#9FB3C8" Margin="1,3,0,0"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ============================== STATUS ============================== -->
+        <Border DockPanel.Dock="Bottom" Background="White" BorderBrush="{StaticResource Line}" BorderThickness="0,1,0,0" Padding="12,7">
+            <DockPanel>
+                <Ellipse x:Name="StatusDot" Width="8" Height="8" Fill="{StaticResource Green}" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                <TextBlock x:Name="TxtStatus" Text="Ready — start with step 1, Rooms." TextWrapping="Wrap"
+                           Foreground="{StaticResource Slate}" FontSize="11"/>
+            </DockPanel>
+        </Border>
+
+        <!-- ============================== STEPS ============================== -->
+        <TabControl x:Name="Tabs" Style="{StaticResource StepTabs}" Background="Transparent" BorderThickness="0">
+
+            <!-- ============ 1 · ROOMS ============ -->
+            <TabItem Header="Rooms" Tag="1">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="12">
+                    <StackPanel>
+                        <Border Style="{StaticResource CardBox}">
+                            <StackPanel>
+                                <TextBlock Text="Find the rooms to protect" Style="{StaticResource H}"/>
+                                <TextBlock Style="{StaticResource Sub}"
+                                           Text="Reads rooms from this model and every loaded architectural link. Electrical, UPS, server, battery and similar rooms are excluded automatically."/>
+                                <DockPanel>
+                                    <Button x:Name="BtnScan" DockPanel.Dock="Right" Content="Scan rooms" Style="{StaticResource Primary}" Margin="0" Click="BtnScan_Click"/>
+                                    <ComboBox x:Name="CmbScope" Margin="0,0,8,0" SelectedIndex="0">
+                                        <ComboBoxItem Content="Level of the active view"/>
+                                        <ComboBoxItem Content="All levels"/>
+                                    </ComboBox>
+                                </DockPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <WrapPanel>
+                            <Border Style="{StaticResource Chip}"><StackPanel>
+                                <TextBlock x:Name="TxtRoomsTotal" Text="0" Style="{StaticResource ChipNum}"/>
+                                <TextBlock Text="rooms found" Style="{StaticResource ChipLbl}"/></StackPanel></Border>
+                            <Border Style="{StaticResource Chip}"><StackPanel>
+                                <TextBlock x:Name="TxtRoomsOn" Text="0" Style="{StaticResource ChipNum}"/>
+                                <TextBlock Text="to sprinkle" Style="{StaticResource ChipLbl}"/></StackPanel></Border>
+                            <Border Style="{StaticResource Chip}" Background="{StaticResource RedTint}"><StackPanel>
+                                <TextBlock x:Name="TxtRoomsOff" Text="0" Style="{StaticResource ChipNum}" Foreground="{StaticResource Red}"/>
+                                <TextBlock Text="no-sprinkler" Style="{StaticResource ChipLbl}"/></StackPanel></Border>
+                        </WrapPanel>
+
+                        <DockPanel Margin="0,2,0,6">
+                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                                <Button Content="All" Style="{StaticResource Btn}" Padding="8,4" Margin="6,0,0,0" Click="BtnAll_Click"/>
+                                <Button Content="None" Style="{StaticResource Btn}" Padding="8,4" Margin="4,0,0,0" Click="BtnNone_Click"/>
+                            </StackPanel>
+                            <TextBox x:Name="TxtFilter" TextChanged="TxtFilter_TextChanged" ToolTip="Filter by room name, number or level"/>
+                        </DockPanel>
+
+                        <DataGrid x:Name="GridRooms" MaxHeight="420" MinHeight="140">
+                            <DataGrid.RowStyle>
+                                <Style TargetType="DataGridRow">
+                                    <Setter Property="ToolTip" Value="{Binding Status}"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsExcluded}" Value="True">
+                                            <Setter Property="Background" Value="{StaticResource RedTint}"/>
+                                            <Setter Property="Foreground" Value="#9B1C1C"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGrid.RowStyle>
+                            <DataGrid.Columns>
+                                <DataGridCheckBoxColumn Header="✓" Binding="{Binding Include, UpdateSourceTrigger=PropertyChanged}" Width="28"/>
+                                <DataGridTextColumn Header="Room" Binding="{Binding Display}" IsReadOnly="True" Width="*"/>
+                                <DataGridTextColumn Header="Level" Binding="{Binding LevelName}" IsReadOnly="True" Width="62"/>
+                                <DataGridTextColumn Header="Height" Binding="{Binding HeightMm, StringFormat=0}" Width="54"/>
+                                <DataGridComboBoxColumn x:Name="ColK" Header="K" SelectedItemBinding="{Binding KOverride, UpdateSourceTrigger=PropertyChanged}" Width="56"/>
+                                <DataGridComboBoxColumn x:Name="ColHead" Header="Head" SelectedItemBinding="{Binding HeadOverride, UpdateSourceTrigger=PropertyChanged}" Width="66"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        <TextBlock Style="{StaticResource Sub}" Margin="0,6,0,0"
+                                   Text="Height = ceiling found over the room, else the room's height (edit it). K Auto → K80, or K160 at/above the double-height threshold. Head Auto → pendant under a ceiling, upright under open roof."/>
+                        <Button Content="Next: sprinkler heads  →" Style="{StaticResource Primary}" HorizontalAlignment="Right" Click="GoHeads_Click"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ============ 2 · HEADS (family library) ============ -->
+            <TabItem Header="Heads" Tag="2">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="12">
+                    <StackPanel>
+                        <Border Style="{StaticResource CardBox}">
+                            <StackPanel>
+                                <TextBlock Text="Sprinkler library" Style="{StaticResource H}"/>
+                                <TextBlock Style="{StaticResource Sub}"
+                                           Text="MorphLab families are built in and load into the project by themselves when you place. Add your own .rfa files, import families already in this project, or make a new K-factor version of a head."/>
+                                <WrapPanel>
+                                    <Button Content="+ Add .rfa files" Style="{StaticResource Primary}" Click="BtnAddRfa_Click"
+                                            ToolTip="Pick one or more .rfa files. K-factor, orientation and type are detected automatically."/>
+                                    <Button Content="Import from project" Style="{StaticResource Btn}" Click="BtnImportProject_Click"
+                                            ToolTip="Imports the families of the sprinklers selected in Revit — or every sprinkler family in the project if nothing is selected."/>
+                                    <Button Content="Load all into project" Style="{StaticResource Btn}" Click="BtnLoadAll_Click"/>
+                                </WrapPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <ListBox x:Name="ListLib" BorderThickness="0" Background="Transparent" SelectionChanged="ListLib_SelectionChanged"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled" Margin="0,0,0,6">
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem">
+                                    <Setter Property="Padding" Value="0"/>
+                                    <Setter Property="Margin" Value="0,0,0,8"/>
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="ListBoxItem">
+                                                <Border x:Name="Tile" Background="White" BorderBrush="#DDE5EF" BorderThickness="1" CornerRadius="10" Padding="10">
+                                                    <ContentPresenter/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsSelected" Value="True">
+                                                        <Setter TargetName="Tile" Property="BorderBrush" Value="#1C6EB5"/>
+                                                        <Setter TargetName="Tile" Property="BorderThickness" Value="2"/>
+                                                        <Setter TargetName="Tile" Property="Padding" Value="9"/>
+                                                    </Trigger>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="Tile" Property="Background" Value="#FAFCFF"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid x:Name="Root">
+                                        <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                        <Border Style="{StaticResource KBadge}" VerticalAlignment="Top" Margin="0,0,10,0">
+                                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                                <TextBlock Text="K" FontSize="9" Foreground="#CCFFFFFF" HorizontalAlignment="Center"/>
+                                                <TextBlock Text="{Binding KFactor}" FontFamily="Bahnschrift, Segoe UI" FontSize="17" Foreground="White" HorizontalAlignment="Center" Margin="0,-3,0,0"/>
+                                            </StackPanel>
+                                        </Border>
+                                        <StackPanel Grid.Column="1">
+                                            <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="13"/>
+                                            <TextBlock Text="{Binding FamilyName}" FontSize="11" Foreground="#475569" TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock FontSize="11" Foreground="#8A97AB" TextTrimming="CharacterEllipsis">
+                                                <Run Text="Type: "/><Run Text="{Binding TypeName, Mode=OneWay}"/>
+                                            </TextBlock>
+                                            <WrapPanel Margin="0,4,0,0">
+                                                <Border Background="#E8F1FA" CornerRadius="5" Padding="6,1" Margin="0,0,4,0">
+                                                    <TextBlock Text="{Binding Source}" FontSize="10" Foreground="#134E86"/>
+                                                </Border>
+                                                <Border Background="#F1F5FA" CornerRadius="5" Padding="6,1">
+                                                    <TextBlock Text="{Binding Status}" FontSize="10" Foreground="#475569"/>
+                                                </Border>
+                                            </WrapPanel>
+                                            <Border x:Name="Warn" Background="#FEF4E2" CornerRadius="6" Padding="7,4" Margin="0,6,0,0" Visibility="Collapsed">
+                                                <TextBlock Text="{Binding Warnings}" TextWrapping="Wrap" FontSize="10.5" Foreground="#A15C07"/>
+                                            </Border>
+                                        </StackPanel>
+                                        <CheckBox Grid.Column="2" IsChecked="{Binding Enabled}" VerticalAlignment="Top" ToolTip="Use in automatic layout"
+                                                  Checked="LibEnabled_Changed" Unchecked="LibEnabled_Changed"/>
+                                    </Grid>
+                                    <DataTemplate.Triggers>
+                                        <DataTrigger Binding="{Binding HasWarnings}" Value="True">
+                                            <Setter TargetName="Warn" Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Enabled}" Value="False">
+                                            <Setter TargetName="Root" Property="Opacity" Value="0.5"/>
+                                        </DataTrigger>
+                                    </DataTemplate.Triggers>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+
+                        <!-- edit the selected family -->
+                        <Border x:Name="CardEdit" Style="{StaticResource CardBox}" Visibility="Collapsed">
+                            <StackPanel>
+                                <TextBlock x:Name="TxtEditTitle" Text="Selected family" Style="{StaticResource H}"/>
+                                <TextBlock Style="{StaticResource Sub}" Text="Fix what detection got wrong. K-factor comes from the family name first, because copied families often keep the old K-Factor value."/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="92"/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions><RowDefinition Height="30"/><RowDefinition Height="30"/><RowDefinition Height="30"/></Grid.RowDefinitions>
+                                    <TextBlock Text="K-factor" Style="{StaticResource FieldLabel}"/>
+                                    <TextBox x:Name="TxtEditK" Grid.Column="1" Margin="0,2" Width="80" HorizontalAlignment="Left"/>
+                                    <TextBlock Grid.Row="1" Text="Orientation" Style="{StaticResource FieldLabel}"/>
+                                    <ComboBox x:Name="CmbEditOrient" Grid.Row="1" Grid.Column="1" Margin="0,2"/>
+                                    <TextBlock Grid.Row="2" Text="Type to use" Style="{StaticResource FieldLabel}"/>
+                                    <ComboBox x:Name="CmbEditType" Grid.Row="2" Grid.Column="1" Margin="0,2"/>
+                                </Grid>
+                                <WrapPanel Margin="0,8,0,0">
+                                    <Button Content="Apply" Style="{StaticResource Primary}" Click="BtnEditApply_Click"/>
+                                    <Button x:Name="BtnRemoveLib" Content="Remove from library" Style="{StaticResource Btn}" Click="BtnRemoveLib_Click"/>
+                                    <Button Content="Show file" Style="{StaticResource Btn}" Click="BtnShowFile_Click"/>
+                                </WrapPanel>
+                                <Border Background="#F4F7FB" CornerRadius="8" Padding="10" Margin="0,6,0,0">
+                                    <StackPanel>
+                                        <TextBlock Text="New K-factor version" FontWeight="SemiBold"/>
+                                        <TextBlock FontSize="11" Foreground="#475569" TextWrapping="Wrap" Margin="0,0,0,6"
+                                                   Text="Same head, different K: copies this family, writes the new K-Factor into every type, renames the K in the names and adds it to your library."/>
+                                        <DockPanel>
+                                            <TextBlock Text="K" Style="{StaticResource FieldLabel}"/>
+                                            <TextBox x:Name="TxtVariantK" Width="70" Text="115" Margin="0,0,8,0"/>
+                                            <Button Content="Create" Style="{StaticResource Primary}" Margin="0" HorizontalAlignment="Left" Click="BtnVariant_Click"/>
+                                        </DockPanel>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- slot mapping -->
+                        <Border Style="{StaticResource CardBox}">
+                            <StackPanel>
+                                <TextBlock Text="Which family is placed" Style="{StaticResource H}"/>
+                                <TextBlock Style="{StaticResource Sub}" Text="Auto picks the enabled library family for each K-factor and orientation. Choose a specific one to override."/>
+                                <ItemsControl x:Name="ListSlots">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Margin="0,0,0,6">
+                                                <Grid.ColumnDefinitions><ColumnDefinition Width="46"/><ColumnDefinition/><ColumnDefinition Width="6"/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                                <TextBlock Text="{Binding K}" FontFamily="Bahnschrift, Segoe UI" FontSize="14" Foreground="#134E86" VerticalAlignment="Center"/>
+                                                <StackPanel Grid.Column="1">
+                                                    <TextBlock Text="Upright" FontSize="10" Foreground="#8A97AB"/>
+                                                    <ComboBox ItemsSource="{Binding UprightOptions}" DisplayMemberPath="Label" SelectedValuePath="Value"
+                                                              SelectedValue="{Binding Upright, Mode=TwoWay}"/>
+                                                </StackPanel>
+                                                <StackPanel Grid.Column="3">
+                                                    <TextBlock Text="Pendant" FontSize="10" Foreground="#8A97AB"/>
+                                                    <ComboBox ItemsSource="{Binding PendantOptions}" DisplayMemberPath="Label" SelectedValuePath="Value"
+                                                              SelectedValue="{Binding Pendant, Mode=TwoWay}"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                                <CheckBox x:Name="ChkSyncK" Margin="0,6,0,0"
+                                          Content="Correct each family's K-Factor parameter to match its name when loading"/>
+                                <TextBlock Style="{StaticResource Sub}" Margin="20,0,0,0"
+                                           Text="Recommended — the bundled K160 and K240 families still carry K-Factor = 80 from the family they were copied from."/>
+                            </StackPanel>
+                        </Border>
+                        <Button Content="Next: plan the layout  →" Style="{StaticResource Primary}" HorizontalAlignment="Right" Click="GoPlan_Click"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ============ 3 · PLAN ============ -->
+            <TabItem Header="Plan" Tag="3">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="12">
+                    <StackPanel>
+                        <Border Style="{StaticResource CardBox}">
+                            <StackPanel>
+                                <DockPanel>
+                                    <Button DockPanel.Dock="Right" Content="↻ Refresh" Style="{StaticResource Btn}" Padding="8,3" Margin="0" Click="BtnRefreshCatalog_Click"/>
+                                    <TextBlock Text="Pipe &amp; system" Style="{StaticResource H}"/>
+                                </DockPanel>
+                                <TextBlock Style="{StaticResource Sub}" Text="Sprinkler families come from step 2 (Heads) and load automatically."/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="92"/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions><RowDefinition Height="30"/><RowDefinition Height="30"/></Grid.RowDefinitions>
+                                    <TextBlock Text="Pipe type" Style="{StaticResource FieldLabel}"/>
+                                    <ComboBox x:Name="CmbPipe" Grid.Column="1" Margin="0,2"/>
+                                    <TextBlock Grid.Row="1" Text="System" Style="{StaticResource FieldLabel}"/>
+                                    <ComboBox x:Name="CmbSystem" Grid.Row="1" Grid.Column="1" Margin="0,2"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource CardBox}">
+                            <StackPanel>
+                                <TextBlock Text="Pipework layout" Style="{StaticResource H}"/>
+                                <Grid Margin="0,4,0,0">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="92"/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions><RowDefinition Height="30"/><RowDefinition Height="30"/><RowDefinition Height="30"/></Grid.RowDefinitions>
+                                    <TextBlock Text="Branch lines" Style="{StaticResource FieldLabel}"/>
+                                    <ComboBox x:Name="CmbBranch" Grid.Column="1" Margin="0,2">
+                                        <ComboBoxItem Content="Along the short side (main on long side)"/>
+                                        <ComboBoxItem Content="Along the long side"/>
+                                    </ComboBox>
+                                    <TextBlock Grid.Row="1" Text="Feed" Style="{StaticResource FieldLabel}"/>
+                                    <ComboBox x:Name="CmbFeed" Grid.Row="1" Grid.Column="1" Margin="0,2">
+                                        <ComboBoxItem Content="Centre-fed branches"/>
+                                        <ComboBoxItem Content="End-fed branches"/>
+                                    </ComboBox>
+                                    <TextBlock Grid.Row="2" Text="Main inlet" Style="{StaticResource FieldLabel}"/>
+                                    <ComboBox x:Name="CmbInlet" Grid.Row="2" Grid.Column="1" Margin="0,2">
+                                        <ComboBoxItem Content="Start of the main"/>
+                                        <ComboBoxItem Content="End of the main"/>
+                                    </ComboBox>
+                                </Grid>
+                                <CheckBox x:Name="ChkPiping" Content="Create sized branch lines, cross main and drops" Margin="0,8,0,2"/>
+                                <CheckBox x:Name="ChkReplace" Content="Replace what this plugin placed before in the same room"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Button x:Name="BtnPlan" Content="Plan selected rooms" Style="{StaticResource Primary}" HorizontalAlignment="Stretch" Click="BtnPlan_Click"/>
+
+                        <!-- the hero: live plan preview -->
+                        <Border Style="{StaticResource CardBox}" Padding="0" Margin="0,4,0,10">
+                            <StackPanel>
+                                <DockPanel Margin="12,10,12,6">
+                                    <ComboBox x:Name="CmbPreview" DockPanel.Dock="Right" Width="170" SelectionChanged="CmbPreview_SelectionChanged"/>
+                                    <TextBlock Text="Layout preview" Style="{StaticResource H}" VerticalAlignment="Center"/>
+                                </DockPanel>
+                                <Border Height="270" Background="#FBFDFF" BorderBrush="{StaticResource Line}" BorderThickness="0,1">
+                                    <Grid>
+                                        <Rectangle Fill="{StaticResource PaperGrid}"/>
+                                        <Canvas x:Name="Preview" ClipToBounds="True" SizeChanged="Preview_SizeChanged"/>
+                                        <TextBlock x:Name="TxtPreviewEmpty" Text="Plan rooms to see the sprinkler grid here."
+                                                   Foreground="{StaticResource Muted}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Grid>
+                                </Border>
+                                <WrapPanel Margin="12,8,12,4">
+                                    <Ellipse Width="9" Height="9" Fill="{StaticResource Red}" Margin="0,0,4,0"/>
+                                    <TextBlock Text="head" FontSize="10.5" Foreground="{StaticResource Slate}" Margin="0,0,12,0"/>
+                                    <Rectangle Width="16" Height="2" Fill="{StaticResource Blue}" Margin="0,0,4,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="branch" FontSize="10.5" Foreground="{StaticResource Slate}" Margin="0,0,12,0"/>
+                                    <Rectangle Width="16" Height="4" Fill="{StaticResource BlueDeep}" Margin="0,0,4,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="cross main" FontSize="10.5" Foreground="{StaticResource Slate}"/>
+                                </WrapPanel>
+                                <WrapPanel Margin="12,4,12,6">
+                                    <Border Style="{StaticResource Chip}"><StackPanel>
+                                        <TextBlock x:Name="TxtPHeads" Text="—" Style="{StaticResource ChipNum}"/>
+                                        <TextBlock x:Name="TxtPK" Text="heads" Style="{StaticResource ChipLbl}"/></StackPanel></Border>
+                                    <Border Style="{StaticResource Chip}"><StackPanel>
+                                        <TextBlock x:Name="TxtPSpacing" Text="—" Style="{StaticResource ChipNum}"/>
+                                        <TextBlock Text="spacing mm" Style="{StaticResource ChipLbl}"/></StackPanel></Border>
+                                    <Border Style="{StaticResource Chip}"><StackPanel>
+                                        <TextBlock x:Name="TxtPWall" Text="—" Style="{StaticResource ChipNum}"/>
+                                        <TextBlock Text="to wall mm" Style="{StaticResource ChipLbl}"/></StackPanel></Border>
+                                    <Border Style="{StaticResource Chip}"><StackPanel>
+                                        <TextBlock x:Name="TxtPCov" Text="—" Style="{StaticResource ChipNum}"/>
+                                        <TextBlock Text="m² / head" Style="{StaticResource ChipLbl}"/></StackPanel></Border>
+                                </WrapPanel>
+                                <ItemsControl x:Name="ListWarnings" Margin="12,0,12,10">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Background="{StaticResource AmberTint}" CornerRadius="6" Padding="8,5" Margin="0,0,0,4">
+                                                <TextBlock Text="{Binding}" TextWrapping="Wrap" Foreground="{StaticResource Amber}" FontSize="11"/>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
+                        <Button Content="Next: place in Revit  →" Style="{StaticResource Primary}" HorizontalAlignment="Right" Click="GoPlace_Click"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ============ 4 · PLACE ============ -->
+            <TabItem Header="Place" Tag="4">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="12">
+                    <StackPanel>
+                        <Border Style="{StaticResource CardBox}">
+                            <StackPanel>
+                                <TextBlock Text="Ready to place" Style="{StaticResource H}"/>
+                                <TextBlock Style="{StaticResource Sub}" Text="Everything goes in as one undo step (Ctrl+Z removes it all)."/>
+                                <WrapPanel>
+                                    <Border Style="{StaticResource Chip}"><StackPanel>
+                                        <TextBlock x:Name="TxtPlRooms" Text="0" Style="{StaticResource ChipNum}"/>
+                                        <TextBlock Text="rooms planned" Style="{StaticResource ChipLbl}"/></StackPanel></Border>
+                                    <Border Style="{StaticResource Chip}" Background="{StaticResource RedTint}"><StackPanel>
+                                        <TextBlock x:Name="TxtPlHeads" Text="0" Style="{StaticResource ChipNum}" Foreground="{StaticResource Red}"/>
+                                        <TextBlock Text="sprinkler heads" Style="{StaticResource ChipLbl}"/></StackPanel></Border>
+                                    <Border Style="{StaticResource Chip}"><StackPanel>
+                                        <TextBlock x:Name="TxtPlBranches" Text="0" Style="{StaticResource ChipNum}"/>
+                                        <TextBlock Text="branch lines" Style="{StaticResource ChipLbl}"/></StackPanel></Border>
+                                </WrapPanel>
+                                <Button x:Name="BtnPlace" Content="Place sprinklers + piping" Style="{StaticResource Fire}" HorizontalAlignment="Stretch" Margin="0,6,0,0" Click="BtnPlace_Click"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource CardBox}">
+                            <StackPanel>
+                                <TextBlock Text="Result" Style="{StaticResource H}"/>
+                                <TextBlock x:Name="TxtPlaceResult" Style="{StaticResource Sub}" Text="Nothing placed yet."/>
+                                <ItemsControl x:Name="ListPlaceRooms">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <DockPanel Margin="0,2">
+                                                <TextBlock DockPanel.Dock="Right" Text="{Binding Status}" Foreground="{StaticResource Slate}" FontSize="11" MaxWidth="170" TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Text="{Binding Display}" TextTrimming="CharacterEllipsis"/>
+                                            </DockPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource CardBox}" Background="{StaticResource BlueTint}" BorderThickness="0">
+                            <TextBlock TextWrapping="Wrap" FontSize="11.5" Foreground="{StaticResource BlueDeep}"
+                                       Text="If fittings fail: the pipe type's Routing Preferences need an elbow, a tee and a cross. Pipes are still placed and sized — connect the open ends, or fix the preferences and re-place (old elements are replaced)."/>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ============ 5 · SIZE ============ -->
+            <TabItem Header="Size" Tag="5">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="12">
+                    <StackPanel>
+                        <Border Style="{StaticResource CardBox}">
+                            <StackPanel>
+                                <TextBlock Text="Auto-size an existing network" Style="{StaticResource H}"/>
+                                <TextBlock Style="{StaticResource Sub}"
+                                           Text="Click the first pipe after the installation valve, near its supply end. Every pipe downstream is sized by the number of sprinklers it feeds. Locked pipes are kept."/>
+                                <DockPanel>
+                                    <TextBlock Text="Table" Style="{StaticResource FieldLabel}"/>
+                                    <Button DockPanel.Dock="Right" Content="Pick inlet pipe &amp; size" Style="{StaticResource Primary}" Margin="8,0,0,0" Click="BtnSizeNetwork_Click"/>
+                                    <ComboBox x:Name="CmbTable" SelectionChanged="CmbTable_SelectionChanged"/>
+                                </DockPanel>
+                                <TextBlock x:Name="TxtSizeResult" Style="{StaticResource Sub}" Margin="0,8,0,0" Text=""/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource CardBox}">
+                            <StackPanel>
+                                <TextBlock Text="Manual size override" Style="{StaticResource H}"/>
+                                <TextBlock Style="{StaticResource Sub}" Text="Select pipes in Revit, choose a size and apply. They are locked so auto-sizing won't change them back."/>
+                                <DockPanel>
+                                    <ComboBox x:Name="CmbManualSize" Width="80" Margin="0,0,8,0"/>
+                                    <Button Content="Apply &amp; lock" Style="{StaticResource Primary}" Margin="0,0,6,0" Click="BtnManualSize_Click"/>
+                                    <Button Content="Unlock" Style="{StaticResource Btn}" Margin="0" Click="BtnUnlock_Click"/>
+                                </DockPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource CardBox}">
+                            <StackPanel>
+                                <TextBlock x:Name="TxtTableTitle" Text="Pipe schedule · K80" Style="{StaticResource H}"/>
+                                <TextBlock Style="{StaticResource Sub}" Text="Rows marked 'assumed' were not in your notes — confirm them in Rules."/>
+                                <ItemsControl x:Name="ListTable">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Margin="0,1">
+                                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                                <TextBlock Text="{Binding Label}" Foreground="{StaticResource Slate}"/>
+                                                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                                    <TextBlock Text="{Binding AssumedText}" Foreground="{StaticResource Amber}" FontSize="10.5" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                                    <Border Background="{StaticResource BlueTint}" CornerRadius="5" Padding="7,1">
+                                                        <TextBlock Text="{Binding Size}" FontFamily="{StaticResource NumFont}" Foreground="{StaticResource BlueDeep}"/>
+                                                    </Border>
+                                                </StackPanel>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ============ 6 · CHECK ============ -->
+            <TabItem Header="Check" Tag="6">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="12">
+                    <StackPanel>
+                        <Border Style="{StaticResource CardBox}">
+                            <StackPanel>
+                                <TextBlock Text="Rule check" Style="{StaticResource H}"/>
+                                <TextBlock Style="{StaticResource Sub}" Text="Checks every sprinkler in the active view: head spacing, wall distance and no-sprinkler rooms. Scan rooms first."/>
+                                <Button Content="Check active view" Style="{StaticResource Primary}" HorizontalAlignment="Stretch" Click="BtnQc_Click"/>
+                                <WrapPanel Margin="0,4,0,0">
+                                    <Border Style="{StaticResource Chip}"><StackPanel>
+                                        <TextBlock x:Name="TxtQcChecked" Text="—" Style="{StaticResource ChipNum}"/>
+                                        <TextBlock Text="checked" Style="{StaticResource ChipLbl}"/></StackPanel></Border>
+                                    <Border Style="{StaticResource Chip}" Background="{StaticResource GreenTint}"><StackPanel>
+                                        <TextBlock x:Name="TxtQcPass" Text="—" Style="{StaticResource ChipNum}" Foreground="{StaticResource Green}"/>
+                                        <TextBlock Text="clean" Style="{StaticResource ChipLbl}"/></StackPanel></Border>
+                                    <Border Style="{StaticResource Chip}" Background="{StaticResource RedTint}"><StackPanel>
+                                        <TextBlock x:Name="TxtQcFail" Text="—" Style="{StaticResource ChipNum}" Foreground="{StaticResource Red}"/>
+                                        <TextBlock Text="failing" Style="{StaticResource ChipLbl}"/></StackPanel></Border>
+                                    <Border Style="{StaticResource Chip}" Background="{StaticResource AmberTint}"><StackPanel>
+                                        <TextBlock x:Name="TxtQcWarn" Text="—" Style="{StaticResource ChipNum}" Foreground="{StaticResource Amber}"/>
+                                        <TextBlock Text="warnings" Style="{StaticResource ChipLbl}"/></StackPanel></Border>
+                                </WrapPanel>
+                                <ListBox x:Name="ListIssues" MaxHeight="260" BorderBrush="{StaticResource Line}" MouseDoubleClick="ListIssues_DoubleClick"
+                                         ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <DockPanel Margin="0,2">
+                                                <Border x:Name="Sev" DockPanel.Dock="Left" Width="4" CornerRadius="2" Background="{StaticResource Amber}" Margin="0,0,8,0"/>
+                                                <StackPanel>
+                                                    <TextBlock><Run Text="{Binding Rule, Mode=OneWay}" FontWeight="SemiBold"/><Run Text="  ·  "/><Run Text="{Binding Room, Mode=OneWay}" Foreground="#475569"/></TextBlock>
+                                                    <TextBlock Text="{Binding Detail}" FontSize="11" Foreground="#475569" TextWrapping="Wrap"/>
+                                                </StackPanel>
+                                            </DockPanel>
+                                            <DataTemplate.Triggers>
+                                                <DataTrigger Binding="{Binding IsFail}" Value="True">
+                                                    <Setter TargetName="Sev" Property="Background" Value="{StaticResource Red}"/>
+                                                </DataTrigger>
+                                            </DataTemplate.Triggers>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                                <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                    <Button Content="Select failing" Style="{StaticResource Btn}" Click="BtnSelectFailing_Click"/>
+                                    <Button Content="Export CSV" Style="{StaticResource Btn}" Click="BtnExportCsv_Click"/>
+                                </StackPanel>
+                                <TextBlock Style="{StaticResource Sub}" Margin="0,2,0,0" Text="Double-click an issue to select and zoom to it."/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource CardBox}">
+                            <StackPanel>
+                                <TextBlock Text="Sprinkler legend" Style="{StaticResource H}"/>
+                                <WrapPanel Margin="0,4,0,4">
+                                    <Border Style="{StaticResource Chip}"><StackPanel>
+                                        <TextBlock x:Name="TxtQtyUp" Text="—" Style="{StaticResource ChipNum}"/>
+                                        <TextBlock Text="upright" Style="{StaticResource ChipLbl}"/></StackPanel></Border>
+                                    <Border Style="{StaticResource Chip}"><StackPanel>
+                                        <TextBlock x:Name="TxtQtyPend" Text="—" Style="{StaticResource ChipNum}"/>
+                                        <TextBlock Text="pendant" Style="{StaticResource ChipLbl}"/></StackPanel></Border>
+                                    <Border Style="{StaticResource Chip}"><StackPanel>
+                                        <TextBlock x:Name="TxtQtyOther" Text="—" Style="{StaticResource ChipNum}"/>
+                                        <TextBlock Text="other" Style="{StaticResource ChipLbl}"/></StackPanel></Border>
+                                </WrapPanel>
+                                <TextBlock x:Name="TxtQtyByK" Style="{StaticResource Sub}" Text=""/>
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Content="Count" Style="{StaticResource Btn}" Click="BtnCount_Click"/>
+                                    <Button Content="Create legend schedule" Style="{StaticResource Btn}" Click="BtnSchedule_Click"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource CardBox}">
+                            <StackPanel>
+                                <TextBlock Text="Installation-valve zones" Style="{StaticResource H}"/>
+                                <TextBlock Style="{StaticResource Sub}" Text="Select a zone's pipes, fittings and heads, give it a number, then colour all zones in the view — like the 7-zone roof drawing."/>
+                                <DockPanel>
+                                    <TextBlock Text="Zone" Style="{StaticResource FieldLabel}"/>
+                                    <TextBox x:Name="TxtZone" Width="60" Text="1" Margin="0,0,8,0"/>
+                                    <Button Content="Assign to selection" Style="{StaticResource Btn}" Margin="0" Click="BtnAssignZone_Click"/>
+                                </DockPanel>
+                                <Button Content="Colour zones in active view" Style="{StaticResource Primary}" HorizontalAlignment="Stretch" Margin="0,8,0,0" Click="BtnZoneColours_Click"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ============ ⚙ · RULES ============ -->
+            <TabItem Header="Rules" Tag="⚙">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="12">
+                    <StackPanel>
+                        <Border Style="{StaticResource CardBox}" Background="{StaticResource BlueTint}" BorderThickness="0">
+                            <TextBlock TextWrapping="Wrap" FontSize="11.5" Foreground="{StaticResource BlueDeep}"
+                                       Text="Defaults come from 'Sprinkler System – Overall Notes'. Change them per project and press Save. Values are in millimetres."/>
+                        </Border>
+
+                        <ItemsControl x:Name="ListRules">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="White" BorderBrush="#DDE5EF" BorderThickness="1" CornerRadius="10" Padding="12" Margin="0,0,0,10">
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding Name}" FontSize="15" FontWeight="Bold" Foreground="#134E86"/>
+                                            <TextBlock Text="{Binding Note}" FontSize="11" Foreground="#475569" TextWrapping="Wrap" Margin="0,0,0,8"/>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition/><ColumnDefinition Width="70"/><ColumnDefinition Width="10"/><ColumnDefinition/><ColumnDefinition Width="70"/>
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions><RowDefinition Height="28"/><RowDefinition Height="28"/><RowDefinition Height="28"/></Grid.RowDefinitions>
+                                                <TextBlock Text="Head–head min" VerticalAlignment="Center" FontSize="11" Foreground="#475569"/>
+                                                <TextBox Grid.Column="1" Text="{Binding HeadToHeadMinMm}" Margin="0,2"/>
+                                                <TextBlock Grid.Column="3" Text="Head–head max" VerticalAlignment="Center" FontSize="11" Foreground="#475569"/>
+                                                <TextBox Grid.Column="4" Text="{Binding HeadToHeadMaxMm}" Margin="0,2"/>
+                                                <TextBlock Grid.Row="1" Text="Wall min" VerticalAlignment="Center" FontSize="11" Foreground="#475569"/>
+                                                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding WallMinMm}" Margin="0,2"/>
+                                                <TextBlock Grid.Row="1" Grid.Column="3" Text="Wall max" VerticalAlignment="Center" FontSize="11" Foreground="#475569"/>
+                                                <TextBox Grid.Row="1" Grid.Column="4" Text="{Binding WallMaxMm}" Margin="0,2"/>
+                                                <TextBlock Grid.Row="2" Text="Max m² / head (0 = off)" VerticalAlignment="Center" FontSize="11" Foreground="#475569"/>
+                                                <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding MaxCoverageM2}" Margin="0,2"/>
+                                            </Grid>
+                                            <TextBlock Text="Pipe schedule (up to N heads → size mm)" FontSize="11" FontWeight="SemiBold" Foreground="#475569" Margin="0,8,0,4"/>
+                                            <DataGrid ItemsSource="{Binding Sizing}" AutoGenerateColumns="False" CanUserAddRows="True" CanUserDeleteRows="True"
+                                                      HeadersVisibility="Column" RowHeight="24" MaxHeight="230">
+                                                <DataGrid.Columns>
+                                                    <DataGridTextColumn Header="Up to heads" Binding="{Binding MaxHeads}" Width="*"/>
+                                                    <DataGridTextColumn Header="Size mm" Binding="{Binding SizeMm}" Width="*"/>
+                                                    <DataGridCheckBoxColumn Header="Assumed" Binding="{Binding Assumed}" Width="64"/>
+                                                </DataGrid.Columns>
+                                            </DataGrid>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <Border Style="{StaticResource CardBox}">
+                            <StackPanel>
+                                <TextBlock Text="Height &amp; selection" Style="{StaticResource H}"/>
+                                <Grid Margin="0,4,0,0">
+                                    <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="80"/></Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="28"/><RowDefinition Height="28"/><RowDefinition Height="28"/><RowDefinition Height="28"/>
+                                        <RowDefinition Height="28"/><RowDefinition Height="28"/><RowDefinition Height="28"/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Text="Double-height threshold (mm)" Style="{StaticResource FieldLabel}"/>
+                                    <TextBox x:Name="TxtThreshold" Grid.Column="1" Margin="0,2"/>
+                                    <TextBlock Grid.Row="1" Text="K-type at/above threshold" Style="{StaticResource FieldLabel}"/>
+                                    <ComboBox x:Name="CmbHighK" Grid.Row="1" Grid.Column="1" Margin="0,2"/>
+                                    <TextBlock Grid.Row="2" Text="Upright head below deck (mm)" Style="{StaticResource FieldLabel}"/>
+                                    <TextBox x:Name="TxtUpBelow" Grid.Row="2" Grid.Column="1" Margin="0,2"/>
+                                    <TextBlock Grid.Row="3" Text="Branch below upright head (mm)" Style="{StaticResource FieldLabel}"/>
+                                    <TextBox x:Name="TxtRiser" Grid.Row="3" Grid.Column="1" Margin="0,2"/>
+                                    <TextBlock Grid.Row="4" Text="Pendant head below ceiling (mm)" Style="{StaticResource FieldLabel}"/>
+                                    <TextBox x:Name="TxtPendBelow" Grid.Row="4" Grid.Column="1" Margin="0,2"/>
+                                    <TextBlock Grid.Row="5" Text="Branch above pendant head (mm)" Style="{StaticResource FieldLabel}"/>
+                                    <TextBox x:Name="TxtDrop" Grid.Row="5" Grid.Column="1" Margin="0,2"/>
+                                    <TextBlock Grid.Row="6" Text="Round spacing to (mm)" Style="{StaticResource FieldLabel}"/>
+                                    <TextBox x:Name="TxtRound" Grid.Row="6" Grid.Column="1" Margin="0,2"/>
+                                </Grid>
+                                <CheckBox x:Name="ChkCeilings" Content="Read ceilings (host + links) for room height" Margin="0,8,0,0"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource CardBox}">
+                            <StackPanel>
+                                <TextBlock Text="No-sprinkler rooms" Style="{StaticResource H}"/>
+                                <TextBlock Style="{StaticResource Sub}" Text="One keyword per line. Whole-word match on the room name, so 'UPS' won't hit 'GROUPS'."/>
+                                <TextBox x:Name="TxtKeywords" AcceptsReturn="True" Height="150" VerticalScrollBarVisibility="Auto" TextWrapping="NoWrap"/>
+                            </StackPanel>
+                        </Border>
+
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Button Content="Reset to notes defaults" Style="{StaticResource Btn}" Click="BtnResetRules_Click"/>
+                            <Button Content="Save rules" Style="{StaticResource Primary}" Click="BtnSaveRules_Click"/>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+        </TabControl>
+    </DockPanel>
+</UserControl>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <AddIn Type="Application">
+    <Name>MorphLab Sprinkler Designer</Name>
+    <Assembly>MorphLab.Sprinkler\MorphLab.Sprinkler.dll</Assembly>
+    <AddInId>6E1C3B7A-4F2D-4C8E-9A51-2B7D90F3C611</AddInId>
+    <FullClassName>MorphLab.Sprinkler.App</FullClassName>
+    <VendorId>MORPHLAB</VendorId>
+    <VendorDescription>MorphLab</VendorDescription>
+  </AddIn>
+</RevitAddIns>

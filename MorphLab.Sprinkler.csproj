@@ -1,0 +1,93 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    MorphLab Sprinkler Designer — one project, four Revit versions.
+    Pick the configuration in Visual Studio's toolbar (e.g. "Release R23") and build.
+      R23 / R24  -> .NET Framework 4.8
+      R25 / R26  -> .NET 8 (windows)
+    If you are dropping these files into your senior's Nice3point template instead,
+    you only need the <Compile>/<Resource>/<Page> items — the template already
+    provides the configurations and RevitAPI package references.
+  -->
+
+  <PropertyGroup>
+    <AssemblyName>MorphLab.Sprinkler</AssemblyName>
+    <RootNamespace>MorphLab.Sprinkler</RootNamespace>
+    <UseWPF>true</UseWPF>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <PlatformTarget>x64</PlatformTarget>
+    <Platforms>AnyCPU</Platforms>
+    <Configurations>Debug R23;Debug R24;Debug R25;Debug R26;Release R23;Release R24;Release R25;Release R26</Configurations>
+    <Version>1.0.0</Version>
+    <Company>MorphLab</Company>
+    <Product>MorphLab Sprinkler Designer</Product>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="$(Configuration.Contains('R23'))">
+    <RevitVersion>2023</RevitVersion>
+    <TargetFramework>net48</TargetFramework>
+  </PropertyGroup>
+  <PropertyGroup Condition="$(Configuration.Contains('R24'))">
+    <RevitVersion>2024</RevitVersion>
+    <TargetFramework>net48</TargetFramework>
+  </PropertyGroup>
+  <PropertyGroup Condition="$(Configuration.Contains('R25'))">
+    <RevitVersion>2025</RevitVersion>
+    <TargetFramework>net8.0-windows</TargetFramework>
+  </PropertyGroup>
+  <PropertyGroup Condition="$(Configuration.Contains('R26'))">
+    <RevitVersion>2026</RevitVersion>
+    <TargetFramework>net8.0-windows</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="$(Configuration.Contains('Debug'))">
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="$(Configuration.Contains('Release'))">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <DefineConstants>$(DefineConstants);REVIT$(RevitVersion)</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Nice3point.Revit.Api.RevitAPI" Version="$(RevitVersion).*" PrivateAssets="all" ExcludeAssets="runtime" />
+    <PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Version="$(RevitVersion).*" PrivateAssets="all" ExcludeAssets="runtime" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+    <Reference Include="System.Xaml" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\*.png" />
+    <!-- MorphLab sprinkler families shipped with the add-in (built-in library) -->
+    <None Include="Families\*.rfa" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <!-- Copies the add-in + manifest into Revit's add-in folder after a Debug build. -->
+  <Target Name="DeployToRevit" AfterTargets="Build" Condition="$(Configuration.Contains('Debug'))">
+    <PropertyGroup>
+      <AddinDir>$(AppData)\Autodesk\Revit\Addins\$(RevitVersion)</AddinDir>
+    </PropertyGroup>
+    <Copy SourceFiles="MorphLab.Sprinkler.addin" DestinationFolder="$(AddinDir)" />
+    <Copy SourceFiles="$(OutputPath)MorphLab.Sprinkler.dll" DestinationFolder="$(AddinDir)\MorphLab.Sprinkler" />
+    <ItemGroup>
+      <BundledFamilies Include="Families\*.rfa" />
+    </ItemGroup>
+    <Copy SourceFiles="@(BundledFamilies)" DestinationFolder="$(AddinDir)\MorphLab.Sprinkler\Families" SkipUnchangedFiles="true" />
+  </Target>
+
+</Project>
